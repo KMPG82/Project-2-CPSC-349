@@ -35,6 +35,7 @@ function initializeBoard() {
         imgElement.setAttribute('draggable', true);
 
         imgElement.addEventListener('dragstart', (event) => {
+            console.log('row and col in initializeBoard: ', row, col)
             dragStart(event, row, col);
         })
 
@@ -51,13 +52,19 @@ function initializeBoard() {
 
 //create dragging implementation
 
-function dragStart(event, row, col) {
+    function dragStart(event, row, col) {
+    console.log('event: ', event);
+    console.log('row and column: ', row,col);
+
     if (board[row][col]) {
-        selectedPiece= { piece: board[row][col], row, col };
+        selectedPiece = { piece: board[row][col], row, col };
+        console.log('selected piece: ', selectedPiece);
+
         event.dataTransfer.setData("text/plain", `${row}__${col}`);
         event.dataTransfer.effectAllowed = "move";
     }
-    console.log('row: ',row, 'column: ', col)
+    console.log('row: ', row, 'column: ', col);
+    console.log('board in dragstart: ', board);
 }
 
 //handle drag over
@@ -175,9 +182,9 @@ function drop(event, newRow, newCol) {
         board[oldRow][oldCol] = null;
         board[newRow][newCol] = selectedPiece.piece;
         //added new event listener
-        selectedPiece.piece.addEventListener('dragstart', (event) => {
+        /* selectedPiece.piece.addEventListener('dragstart', (event) => {
             dragStart(event, newRow, newCol);
-        })
+        }) */
 
         // Optionally, you can add code here to switch turns between players
 
