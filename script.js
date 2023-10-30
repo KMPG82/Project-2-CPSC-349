@@ -31,7 +31,7 @@ function initializeBoard() {
         let imgElement = document.createElement('img');
         imgElement.src = `/assets/${piece}.svg`;
         imgElement.classList.add('chess__piece');
-        imgElement.alt = piece.replace('__',' ');
+        imgElement.alt = piece;
         imgElement.setAttribute('draggable', true);
 
         imgElement.addEventListener('dragstart', (event) => {
@@ -66,22 +66,29 @@ function allowDrop(event) {
 }
 
 //check if pieces are legal moves
-function isLegalMove(piece, oldRow, oldCol, newRow, newCol, board) {
+function isLegalMove(piece, oldRow, oldCol, newRow, newCol, deltaRow, board) {
+    console.log('Entering isLegalMove Function:', piece, oldRow, oldCol, newRow, newCol);
+    console.log('Piece value before switch:', piece);
     let isLegal = false;
-    let deltaRow = oldRow - newRow;
     let deltaCol = newCol - oldCol;
 
     switch (piece) {
         case 'w__pawn':
-            //if white pawn moves one space up
+            console.log('Inside w__pawn case');
+            console.log('Delta Row:', deltaRow, 'Delta Col:', deltaCol);
+
             if (deltaCol === 0 && deltaRow === -1) {
+                console.log('Checking 1 space move. Destination Square:', board[newRow][newCol]);
                 isLegal = board[newRow][newCol] === null;
-            //if white pawn moves 2 spaces up. checks if its in starting position
+                console.log('White Pawn Move 1 Space:', isLegal);
             } else if (deltaCol === 0 && deltaRow === -2 && oldRow === 6) {
+                console.log('Checking 2 space move. Destination Square:', board[newRow][newCol], 'Square in front:', board[oldRow - 1][oldCol]);
                 isLegal = board[newRow][newCol] === null && board[oldRow - 1][oldCol] === null;
+                console.log('White Pawn Move 2 Spaces:', isLegal);
             } else if (Math.abs(deltaCol) === 1 && deltaRow === -1) {
-            // en passant :)))))))
-            isLegal = board[newRow][newCol] !== null && board[newRow][newCol].alt.startsWith("b__");
+                console.log('Checking capture move. Destination Square:', board[newRow][newCol]);
+                isLegal = board[newRow][newCol] !== null && board[newRow][newCol].alt.startsWith("b__");
+                console.log('White Pawn Capture:', isLegal);
             }
             break;
         case 'b__pawn':
@@ -127,6 +134,7 @@ function isLegalMove(piece, oldRow, oldCol, newRow, newCol, board) {
             isLegal = Math.abs(newRow - oldRow) <= 1 && Math.abs(newCol - oldCol) <= 1;
     }
     console.log('Is Legal Move:', isLegal, piece, oldRow, oldCol, newRow, newCol);   
+    console.log('Move Legal:', isLegal);
     return isLegal;
 }
 
@@ -134,6 +142,7 @@ function isLegalMove(piece, oldRow, oldCol, newRow, newCol, board) {
 //check path
 
 function isPathClear(oldRow, oldCol, newRow, newCol, board) {
+    console.log('Checking Path:', 'Row:', row, 'Col:', col, 'Board Position:', board[row][col]);
     let deltaRow = Math.sign(newRow - oldRow);
     let deltaCol = Math.sign(newCol - oldCol);
 
@@ -158,7 +167,8 @@ function drop(event, newRow, newCol) {
     console.log("Old Position String:", oldPosition);
     const [oldRow, oldCol] = oldPosition.split('__').map(Number);
     console.log("Parsed Old Position:", oldRow, oldCol);
-    if (isLegalMove(selectedPiece.piece.alt, oldRow, oldCol, newRow, newCol, board)) {
+    const deltaRow = newRow - oldRow;
+    if (isLegalMove(selectedPiece.piece.alt, oldRow, oldCol, newRow, newCol, deltaRow, board)) {
         // Valid move, update the board
         board[oldRow][oldCol] = null;
         board[newRow][newCol] = selectedPiece.piece;
