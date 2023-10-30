@@ -25,7 +25,7 @@ let selectedPiece = null;
 
 function initializeBoard() {
     board = initialBoardState.map(row => row.slice());
-
+    console.log('board: ', board)
     function createPiece(piece, row, col) {
         if (!piece) return null;
         let imgElement = document.createElement('img');
@@ -57,6 +57,7 @@ function dragStart(event, row, col) {
         event.dataTransfer.setData("text/plain", `${row}__${col}`);
         event.dataTransfer.effectAllowed = "move";
     }
+    console.log('row: ',row, 'column: ', col)
 }
 
 //handle drag over
@@ -135,6 +136,7 @@ function isLegalMove(piece, oldRow, oldCol, newRow, newCol, deltaRow, board) {
     }
     console.log('Is Legal Move:', isLegal, piece, oldRow, oldCol, newRow, newCol);   
     console.log('Move Legal:', isLegal);
+    console.log('board: ', board);
     return isLegal;
 }
 
@@ -172,6 +174,10 @@ function drop(event, newRow, newCol) {
         // Valid move, update the board
         board[oldRow][oldCol] = null;
         board[newRow][newCol] = selectedPiece.piece;
+        //added new event listener
+        selectedPiece.piece.addEventListener('dragstart', (event) => {
+            dragStart(event, newRow, newCol);
+        })
 
         // Optionally, you can add code here to switch turns between players
 
@@ -204,6 +210,7 @@ function renderBoard() {
             chessBoard.appendChild(square);
         });
     });
+    console.log('chess board: ', chessBoard);
 }
 
 resetButton.addEventListener('click', () => {
