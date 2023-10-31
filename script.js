@@ -25,7 +25,8 @@ let selectedPiece = null;
 
 function initializeBoard() {
     board = initialBoardState.map(row => row.slice());
-    console.log('board: ', board)
+    console.log(board);
+    console.log('board in initializeBoard: ', board)
     function createPiece(piece, row, col) {
         if (!piece) return null;
         let imgElement = document.createElement('img');
@@ -35,6 +36,7 @@ function initializeBoard() {
         imgElement.setAttribute('draggable', true);
 
         imgElement.addEventListener('dragstart', (event) => {
+            console.log('event in addeventlistener dragstart: ', event);
             console.log('row and col in initializeBoard: ', row, col)
             dragStart(event, row, col);
         })
@@ -53,6 +55,7 @@ function initializeBoard() {
 //create dragging implementation
 
     function dragStart(event, row, col) {
+
     console.log('event: ', event);
     console.log('row and column: ', row,col);
 
@@ -120,7 +123,21 @@ function isLegalMove(piece, oldRow, oldCol, newRow, newCol, deltaRow, board) {
         case 'b__bishop':
             // Bishop moving diagnolly 
             if (Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
-                isLegal = isPathClear(oldRow, oldCol, newRow, newCol, board);
+                let rowDirection = 0;
+                let columnDirection = 0;
+                if (oldRow < newRow) {
+                    rowDirection = 1;
+                }
+                else rowDirection = -1;
+
+                if (oldCol < newCol) {
+                    columnDirection = 1;
+                }
+                else columnDirection = -1;
+         
+                let currentRow = oldRow + rowDirection;
+                let currentCol = oldCol + columnDirection;
+                isLegal = isPathClear(currentRow, newRow, currentCol, newCol, rowDirection, columnDirection, board);
             }
             break;
         case 'w__rook':
@@ -150,18 +167,16 @@ function isLegalMove(piece, oldRow, oldCol, newRow, newCol, deltaRow, board) {
 
 //check path
 
-function isPathClear(oldRow, oldCol, newRow, newCol, board) {
-    console.log('Checking Path:', 'Row:', row, 'Col:', col, 'Board Position:', board[row][col]);
-    let deltaRow = Math.sign(newRow - oldRow);
-    let deltaCol = Math.sign(newCol - oldCol);
-
-    for (let row = oldRow + deltaRow, col = oldCol + deltaCol; 
-         row !== newRow || col !== newCol; 
-         row += deltaRow, col += deltaCol) {
-        if (board[row][col] !== null) {
-            return false;
+function isPathClear(currentRow, newRow, currentCol, newCol, rowDirection, colDirection, board) {
+    while (currentRow !== newRow && currentCol !== newCol) {
+        if (board[currentRow][currentCol] !== null) {
+          // There is a piece in the path, not a clear path
+          return false;
         }
+        currentRow += rowDirection;
+        currentCol += colDirection;
     }
+    
     return true;
 }
 
@@ -181,10 +196,18 @@ function drop(event, newRow, newCol) {
         // Valid move, update the board
         board[oldRow][oldCol] = null;
         board[newRow][newCol] = selectedPiece.piece;
-        //added new event listener
-        /* selectedPiece.piece.addEventListener('dragstart', (event) => {
+
+        //remove previous event listener
+        selectedPiece.piece.removeEventListener('dragstart', (event) => {
             dragStart(event, newRow, newCol);
-        }) */
+        }); 
+        console.log('selected piece in drop function: ',selectedPiece)
+        //added new event listener
+        selectedPiece.piece.addEventListener('dragstart', (event) => {
+            dragStart(event, newRow, newCol);
+        }); 
+
+      
 
         // Optionally, you can add code here to switch turns between players
 
