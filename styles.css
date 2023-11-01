@@ -24,6 +24,10 @@
 .dark {
     background-color: darkgrey;
 }
+
+.move__legal {
+    background-color: darkcyan;
+}
 .chess__piece {
     width: 50px;
     height: 50px;
