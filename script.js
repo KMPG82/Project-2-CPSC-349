@@ -21,7 +21,8 @@ let playerTurn;
 // Creates <div class= chess__square>  elements
 
 function createBoard() {
-  board = initialBoardState;
+  board = [...initialBoardState];
+  console.log('board: ', board);
   for (let rank = 0; rank < 8; rank++) {
     for (let file = 0; file < 8; file++) {
       let square = document.createElement('div');
@@ -228,6 +229,19 @@ function isKingSafe() {
  // NEED TO IMPLEMENT
 }
 
+resetButton.addEventListener('click', () => {
+  reset();
+  createBoard();
+  initializePieces();
+});
+
+function reset() {
+  selectedPiece = null;
+  playerTurn = 'w';
+  while (chessBoard.hasChildNodes()) {
+    chessBoard.removeChild(chessBoard.firstChild);
+  }
+}
 
 // DRIVER START
 
