@@ -10,6 +10,7 @@
     display: grid;
     grid-template-columns: repeat(8, 60px);
     grid-template-rows: repeat(8, 60px);
+    border: 1px solid #333;
 }
 
 .chess__square {
@@ -18,9 +19,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #333;
 }
 
+.dark {
+    background-color: darkgrey;
+}
 .chess__piece {
     width: 50px;
     height: 50px;
