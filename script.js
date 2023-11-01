@@ -126,82 +126,79 @@ function dragOver(event) {
   event.preventDefault();
 }
 
-//check if pieces are legal moves
-function isLegalMove(piece, oldRow, oldCol, newRow, newCol, deltaRow, board) {
-    console.log('Entering isLegalMove Function:', piece, oldRow, oldCol, newRow, newCol);
-    console.log('Piece value before switch:', piece);
-    let isLegal = false;
-    let deltaCol = newCol - oldCol;
-
-    switch (piece) {
-        case 'w__pawn':
-            console.log('Inside w__pawn case');
-            console.log('Delta Row:', deltaRow, 'Delta Col:', deltaCol);
-
-            if (deltaCol === 0 && deltaRow === -1) {
-                console.log('Checking 1 space move. Destination Square:', board[newRow][newCol]);
-                isLegal = board[newRow][newCol] === null;
-                console.log('White Pawn Move 1 Space:', isLegal);
-            } else if (deltaCol === 0 && deltaRow === -2 && oldRow === 6) {
-                console.log('Checking 2 space move. Destination Square:', board[newRow][newCol], 'Square in front:', board[oldRow - 1][oldCol]);
-                isLegal = board[newRow][newCol] === null && board[oldRow - 1][oldCol] === null;
-                console.log('White Pawn Move 2 Spaces:', isLegal);
-            } else if (Math.abs(deltaCol) === 1 && deltaRow === -1) {
-                console.log('Checking capture move. Destination Square:', board[newRow][newCol]);
-                isLegal = board[newRow][newCol] !== null && board[newRow][newCol].alt.startsWith("b__");
-                console.log('White Pawn Capture:', isLegal);
-            }
-            break;
-        case 'b__pawn':
-            //if black pawn moves one space down
-            if (deltaCol === 0 && deltaRow === 1) {
-                isLegal = board[newRow][newCol] === null;
-            //if white pawn moves 2 spaces down. checks if its in starting position
-            } else if (deltaCol === 0 && deltaRow === 2 && oldRow === 1) {
-                isLegal = board[newRow][newCol] === null && board[oldRow + 1][oldCol] === null;
-            } else if (Math.abs(deltaCol) === 1 && deltaRow == 1) {
-                isLegal = board[newRow][newCol] !== null && board[newRow][newCol].alt.startsWith("w__");
-            }
-            break;
-        //Knights and Pawns don't need isPathClear
-        case 'w__knight':
-        case 'b__knight':
-            // Knights move L shape all directions
-            isLegal = (Math.abs(newRow - oldRow) === 2 && Math.abs(newCol - oldCol) === 1) || (Math.abs(newRow - oldRow) === 1 && Math.abs(newCol - oldCol) === 2);
-            break;
-        case 'w__bishop':
-        case 'b__bishop':
-            // Bishop moving diagnolly 
-            if (Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
-                isLegal = isPathClear(oldRow, oldCol, newRow, newCol, board);
-            }
-            break;
-        case 'w__rook':
-        case 'b__rook':
-            //Rooks moving horizontally/vertically
-            if (newRow === oldRow || newCol === oldCol) {
-                isLegal = isPathClear(oldRow, oldCol, newRow, newCol, board);
-            }
-            break;
-        case 'w__queen':
-        case 'b__queen':
-            // ALL DIRECTIONS TO THE QUEEN
-            if (newRow === oldRow || newCol === oldCol || Math.abs(newRow - oldRow) === Math.abs(newCol - oldCol)) {
-                isLegal = isPathClear(oldRow, oldCol, newRow, newCol, board);
-            }
-            break;
-        case 'w__king':
-        case 'b__king':
-            isLegal = Math.abs(newRow - oldRow) <= 1 && Math.abs(newCol - oldCol) <= 1;
-    }
-    console.log('Is Legal Move:', isLegal, piece, oldRow, oldCol, newRow, newCol);   
-    console.log('Move Legal:', isLegal);
-    console.log('board: ', board);
-    return isLegal;
+// Switches player turn status and updates game status
+function changePlayer() {
+  if (playerTurn === 'w') {
+    playerTurn = 'b';
+    gameStatus.textContent = "Black's turn."
+  } else {
+    playerTurn = 'w';
+    gameStatus.textContent = "White's turn."
+  }
 }
 
+// CHESS LOGIC
+function isLegalMove(piece, startPos, endPos) {
+  console.log(piece, startPos, endPos);
+  let legal = false;
 
-//check path
+  startPos = Number(startPos);
+  endPos = Number(endPos);
+  switch (piece) {
+    case 'w__pawn':
+      const w_startRank = [48,49,50,51,52,53,54,55];
+      if (w_startRank.includes(startPos) && startPos + (-8) * 2 === endPos) {
+        legal = true;
+      } else if (startPos + (-8) === endPos) {
+        legal = true;
+      } else if ((startPos - 7 === endPos || startPos - 9 === endPos) && board[endPos] !== null) {
+        legal = true;
+      }
+      break;
+    
+    case 'b__pawn':
+      const b_startRank = [8,9,10,11,12,13,14,15];
+      if (b_startRank.includes(startPos) && startPos + 8 * 2 === endPos) {
+        legal = true;
+      } if (startPos + 8 === endPos) {
+        legal = true;
+      }
+      break;
+    case 'w__knight':
+    case 'b__knight':
+      const knightOffset = [15, 17, 10, 6];
+      if (knightOffset.includes(Math.abs(startPos - endPos))) {
+        legal = true;
+       }
+      break;
+    case 'w__bishop':
+    case 'b__bishop':
+      if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0) {
+        legal = isPathClear(startPos, endPos);
+      }
+      break;
+    case 'w__rook':
+    case 'b__rook':
+      if (Math.abs(startPos - endPos) % 8 === 0 || Math.abs(startPos - endPos) < startPos + 8) {
+        legal = isPathClear(startPos, endPos);
+      }
+    case 'w__queen':
+    case 'b__queen':
+      if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0 ||
+          Math.abs(startPos - endPos) % 8 === 0 || Math.abs(startPos - endPos) < startPos + 8
+      ) {
+        legal = isPathClear(startPos, endPos);
+      }
+    case 'w__king':
+    case 'b__king':
+      const kingOffset = [1, 7, 8, 9];
+      if (kingOffset.includes(Math.abs(startPos - endPos))) {
+        legal = isPathClear(startPos, endPos);
+      }
+  }
+  
+  return legal;
+}
 
 function isPathClear(startPos, endPos) {
   let startRank = Math.floor(startPos / 8);
