@@ -27,6 +27,8 @@
 
 .move__legal {
     background-color: darkcyan;
+    border: solid;
+    box-sizing: border-box;
 }
 .chess__piece {
     width: 50px;
