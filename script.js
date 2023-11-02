@@ -126,7 +126,7 @@ function dragDrop(event) {
   console.log("the child: ", child);
   if (child !== null) {
     child.remove();
-    //check if king
+    //check if the piece being taken is a king piece
     if (child.alt === 'b__king' || child.alt === 'w__king') {
       if (child.alt === 'b__king') {
         alert('White has won!');
@@ -140,15 +140,33 @@ function dragDrop(event) {
     }
   }
 
-  console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
-  if (isPromotion(piece, startPos, endPos)) {
-    Promote();
+  if (piece === 'w__pawn' || piece === 'b__pawn') {
+    //check if its a pawn that can be promoted
+    console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
+    if (isPromotion(piece, startPos, endPos)) {
+      Promote();
+    }
   }
-
+   
   square.appendChild(selectedPiece);
   board[endPos] = board[startPos];
   board[startPos] = null;
+
+  if (piece === 'w__king' || piece === 'b__king') {
+    //check if castling
+    console.log('isCastling: ', isCastling(piece, startPos, endPos));
+    if (isCastling(piece, startPos, endPos)) {
+      //move rook
+      castle(piece, startPos, endPos);
+    }
+  }
+
   changePlayer();
+
+  if ('w__rook' === board[56]) {
+    console.log('rook position',board[56]);
+
+  }
 }
 
 function dragOver(event) {
@@ -249,6 +267,12 @@ function isLegalMove(piece, startPos, endPos) {
       const kingOffset = [1, 7, 8, 9];
       if (kingOffset.includes(Math.abs(startPos - endPos))) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+      } //castling
+      else if (piece === 'w__king' && startPos == 60 && ((endPos == 62  && 'w__rook' === board[63]) || (endPos == 58  && 'w__rook' === board[56]))) {
+        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+      } //castling
+      else if (piece === 'b__king'  && startPos == 4 && ((endPos == 2  && 'b__rook' === board[0]) || (endPos == 6  && 'b__rook' === board[7]))) {
+        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
   }
@@ -297,6 +321,85 @@ function Promote() {
   console.log('alt after promote:', selectedPiece.alt);
 }
 
+function isCastling(piece, startPos, endPos) {
+  if (piece === 'w__king' && startPos == 60 && ((endPos == 62 && 'w__rook' === board[63]) || (endPos == 58 && 'w__rook' === board[56]))) {
+    return true;
+  }
+  else
+    if (piece === 'b__king' && startPos == 4 && ((endPos == 6 && 'b__rook' === board[7]) || (endPos == 2 && 'b__rook' === board[0]))) {
+      return true;
+    }
+    else return false;
+}
+
+function castle(piece, startPos, endPos) {
+  if (piece === 'w__king') {
+    if (startPos == 60 && endPos == 62 && 'w__rook' === board[63]) {
+      let rookSquare = document.querySelector('[square-id="63"]');
+      let rook = rookSquare.querySelector('img');
+      let emptySquare = document.querySelector('[square-id="61"]');
+
+      let temp = board[63]; //rook
+      board[63] = board[61]; //swap empty space
+      board[61] = temp; //swap rook
+
+      emptySquare.appendChild(rook);
+     
+      console.log('im rooksquare', rookSquare);
+      console.log('im rook', rook);
+      console.log('im emptysquare', emptySquare);
+    }
+    else {
+      let rookSquare = document.querySelector('[square-id="56"]');
+      let rook = rookSquare.querySelector('img');
+      let emptySquare = document.querySelector('[square-id="59"]');
+
+      let temp = board[56]; //rook
+      board[56] = board[59]; //swap empty space
+      board[59] = temp; //swap rook
+
+      emptySquare.appendChild(rook);
+     
+      console.log('im rooksquare', rookSquare);
+      console.log('im rook', rook);
+      console.log('im emptysquare', emptySquare);
+    }
+  }
+  if (piece === 'b__king') {
+    if (startPos == 4 && endPos == 6 && 'b__rook' === board[7]) {
+      let rookSquare = document.querySelector('[square-id="7"]');
+      let rook = rookSquare.querySelector('img');
+      let emptySquare = document.querySelector('[square-id="5"]');
+
+      let temp = board[7]; //rook
+      board[7] = board[5]; //swap empty space
+      board[5] = temp; //swap rook
+
+      emptySquare.appendChild(rook);
+     
+      console.log('im rooksquare', rookSquare);
+      console.log('im rook', rook);
+      console.log('im emptysquare', emptySquare);
+    }
+    else {
+      let rookSquare = document.querySelector('[square-id="0"]');
+      let rook = rookSquare.querySelector('img');
+      let emptySquare = document.querySelector('[square-id="3"]');
+
+      let temp = board[0]; //rook
+      board[0] = board[3]; //swap empty space
+      board[3] = temp; //swap rook
+
+      emptySquare.appendChild(rook);
+     
+      console.log('im rooksquare', rookSquare);
+      console.log('im rook', rook);
+      console.log('im emptysquare', emptySquare);
+    }
+  }
+  console.log('board in castle: ', board);
+}
+
 function isPathClear(startPos, endPos) {
   let startRank = Math.floor(startPos / 8);
   let startFile = startPos % 8;
@@ -318,7 +421,6 @@ function isPathClear(startPos, endPos) {
   }
   return true;
 }
-
 
 function isKingSafe() {
  // NEED TO IMPLEMENT
