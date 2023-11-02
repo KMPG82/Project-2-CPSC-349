@@ -246,15 +246,15 @@ function isLegalMove(piece, startPos, endPos) {
 //check if pawn will promote
 function isPromotion(piece, startPos, endPos) {
   if (piece === 'w__pawn') {
-    const otherSidePos = ['0', '1', '2', '3', '4', '5', '6', '7'];
-    if (otherSidePos.includes(endPos)) {
+    //const otherSidePos = ['0', '1', '2', '3', '4', '5', '6', '7'];
+    if (endPos >= 0 && endPos <= 7) {
       return true;
     }
     else return false;
   }
   else if (piece === 'b__pawn') {
-    const otherSidePos = ['56', '57', '58', '59', '60', '61', '62', '63'];
-    if (otherSidePos.includes(endPos)) {
+    //const otherSidePos = ['56', '57', '58', '59', '60', '61', '62', '63'];
+    if (endPos >= 56 && endPos <= 63) {
       return true;
     }
     else return false;
