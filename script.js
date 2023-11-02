@@ -123,13 +123,26 @@ function dragDrop(event) {
   console.log('is legal move: ',!isLegalMove(piece, startPos, endPos));
   if (!isLegalMove(piece, startPos, endPos)) { return; }
 
+  console.log("the child: ", child);
+  if (child !== null) {
+    child.remove();
+    //check if king
+    if (child.alt === 'b__king' || child.alt === 'w__king') {
+      if (child.alt === 'b__king') {
+        alert('White has won!');
+      }
+      else if (child.alt === 'w__king') {
+        alert('Black has won!');
+      }
+      reset();
+      createBoard();
+      initializePieces();
+    }
+  }
+
   console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
   if (isPromotion(piece, startPos, endPos)) {
     Promote();
-  }
-
-  if (child !== null) {
-    child.remove();
   }
 
   square.appendChild(selectedPiece);
