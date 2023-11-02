@@ -261,6 +261,8 @@ resetButton.addEventListener('click', () => {
 function reset() {
   selectedPiece = null;
   playerTurn = 'w';
+  gameStatus.textContent = "White's turn."
+
   while (chessBoard.hasChildNodes()) {
     chessBoard.removeChild(chessBoard.firstChild);
   }
