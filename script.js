@@ -120,7 +120,13 @@ function dragDrop(event) {
   }
 
   const endPos = square.getAttribute('square-id');
+  console.log('is legal move: ',!isLegalMove(piece, startPos, endPos));
   if (!isLegalMove(piece, startPos, endPos)) { return; }
+
+  console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
+  if (isPromotion(piece, startPos, endPos)) {
+    Promote();
+  }
 
   if (child !== null) {
     child.remove();
@@ -156,12 +162,19 @@ function isLegalMove(piece, startPos, endPos) {
   endPos = Number(endPos);
   switch (piece) {
     case 'w__pawn':
-      const w_startRank = [48,49,50,51,52,53,54,55];
+      const w_startRank = [48, 49, 50, 51, 52, 53, 54, 55];
+      //move two spaces if in starting position
       if (w_startRank.includes(startPos) && startPos + -8 * 2 === endPos) {
+        console.log('1');
         legal = isPathClear(startPos, endPos) && board[endPos] === null;
-      } else if (startPos - 8 === endPos) {
+      }//move one space
+      else if (startPos - 8 === endPos) {
+        console.log('2');
         legal = isPathClear(startPos, endPos) && board[endPos] === null;
-      } else if ((startPos - 7 === endPos || startPos - 9 === endPos) && board[endPos] !== null) {
+      }//diagonal capture
+      else if ((startPos - 7 === endPos || startPos - 9 === endPos) && board[endPos] !== null) {
+        console.log('3');
+
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
@@ -170,12 +183,14 @@ function isLegalMove(piece, startPos, endPos) {
       const b_startRank = [8,9,10,11,12,13,14,15];
       if (b_startRank.includes(startPos) && startPos + 8 * 2 === endPos) {
         legal = isPathClear(startPos, endPos) && board[endPos] === null;
+
       } else if (startPos + 8 === endPos) {
         legal = isPathClear(startPos, endPos) && board[endPos] === null;
       } else if ((startPos + 7 === endPos || startPos + 9 === endPos) && board[endPos] !== null) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
+    
     case 'w__knight':
     case 'b__knight':
       const knightOffset = [15, 17, 10, 6];
@@ -193,12 +208,14 @@ function isLegalMove(piece, startPos, endPos) {
         }
        }
       break;
+    
     case 'w__bishop':
     case 'b__bishop':
       if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
+    
     case 'w__rook':
     case 'b__rook':
       if (Math.abs(startPos - endPos) % 8 === 0 || Math.floor(startPos / 8) === Math.floor(endPos / 8)) {
@@ -213,6 +230,7 @@ function isLegalMove(piece, startPos, endPos) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
+    
     case 'w__king':
     case 'b__king':
       const kingOffset = [1, 7, 8, 9];
@@ -223,6 +241,47 @@ function isLegalMove(piece, startPos, endPos) {
   }
   console.log(legal);
   return legal;
+}
+
+//check if pawn will promote
+function isPromotion(piece, startPos, endPos) {
+  if (piece === 'w__pawn') {
+    const otherSidePos = ['0', '1', '2', '3', '4', '5', '6', '7'];
+    if (otherSidePos.includes(endPos)) {
+      return true;
+    }
+    else return false;
+  }
+  else if (piece === 'b__pawn') {
+    const otherSidePos = ['56', '57', '58', '59', '60', '61', '62', '63'];
+    if (otherSidePos.includes(endPos)) {
+      return true;
+    }
+    else return false;
+  }
+}
+
+function Promote() {
+  console.log('promotion piece', selectedPiece);
+  console.log(selectedPiece.src);
+  choices = ['Queen', 'Rook', 'Knight', 'Bishop'];
+  let userChoice = '';
+  let validChoice = true;
+  while (validChoice) {
+    userChoice = prompt(`Promotion choices: ${choices.join(', ')}`, 'Queen');
+    userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
+    if (choices.includes(userChoice))
+    {
+      validChoice = false;
+      }
+  }
+  console.log('alt:', selectedPiece.alt);
+  console.log('alt:', selectedPiece.alt[0]);
+
+  selectedPiece.src = `/assets/${selectedPiece.alt[0]}__${userChoice}.svg`;
+  selectedPiece.alt = `${selectedPiece.alt[0]}__${userChoice.charAt(0).toLowerCase() + userChoice.slice(1)}`;
+
+  console.log('alt after promote:', selectedPiece.alt);
 }
 
 function isPathClear(startPos, endPos) {
