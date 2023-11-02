@@ -55,7 +55,7 @@ function initializePieces() {
       if (pieceName !== null) {
         let color = pieceName[0];
         let pieceImg = document.createElement('img');
-        pieceImg.src = `/assets/${pieceName}.svg`;
+        pieceImg.src = `${pieceName}.svg`;
         pieceImg.classList.add('chess__piece');
         pieceImg.classList.add(color);
         pieceImg.alt = pieceName;
@@ -162,11 +162,7 @@ function dragDrop(event) {
   }
 
   changePlayer();
-
-  if ('w__rook' === board[56]) {
-    console.log('rook position',board[56]);
-
-  }
+  saveGame();
 }
 
 function dragOver(event) {
@@ -440,6 +436,12 @@ function reset() {
   while (chessBoard.hasChildNodes()) {
     chessBoard.removeChild(chessBoard.firstChild);
   }
+}
+
+function saveGame() {
+  console.log('initial board before saving: ', initialBoardState);
+  console.log('board before saving: ', board);
+  localStorage.setItem('savedGame', board);
 }
 
 // DRIVER START
