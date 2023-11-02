@@ -27,8 +27,10 @@
 
 .move__legal {
     background-color: darkcyan;
-    border: solid;
-    box-sizing: border-box;
+}
+
+.dark.move__legal {
+    background-color: rgba(0, 139, 139, 0.781);
 }
 .chess__piece {
     width: 50px;
