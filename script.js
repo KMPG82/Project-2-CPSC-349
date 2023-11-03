@@ -433,7 +433,6 @@ resetButton.addEventListener('click', () => {
 });
 
 function reset() {
-  localStorage.clear();
   selectedPiece = '';
   playerTurn = 'w';
   gameStatus.textContent = "White's turn."
