@@ -427,7 +427,7 @@ function isKingSafe() {
 
 resetButton.addEventListener('click', () => {
   reset();
-  createBoard();
+  createBoard(initialBoardState);
   initializePieces();
 });
 
