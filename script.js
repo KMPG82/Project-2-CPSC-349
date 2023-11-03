@@ -433,6 +433,7 @@ resetButton.addEventListener('click', () => {
 });
 
 function reset() {
+  localStorage.clear();
   selectedPiece = '';
   playerTurn = 'w';
   gameStatus.textContent = "White's turn."
@@ -482,7 +483,7 @@ function checkForSavedGame() {
 
 // DRIVER START
 
- if (checkForSavedGame) {
+ if (checkForSavedGame()) {
    const loadedGame = loadGame();
    const loadedPlayerTurn = loadPlayerTurn();
 
