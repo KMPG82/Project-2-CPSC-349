@@ -447,6 +447,14 @@ function saveGame() {
   localStorage.setItem('savedGame', board);
 }
 
+function loadGame() {
+  let loadedGame = localStorage.getItem('savedGame');
+  console.log('loadedGame: ', loadedGame);
+
+  const loadedGameArray = loadedGame.split(',');
+  console.log('arary: ', loadedGameArray);
+}
+
 // DRIVER START
 
 createBoard();
@@ -455,3 +463,5 @@ createBoard();
 playerTurn = 'w';
 gameStatus.textContent = "White's turn."
 initializePieces();
+
+loadGame();
