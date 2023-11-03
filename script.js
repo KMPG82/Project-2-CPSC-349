@@ -135,9 +135,11 @@ function dragDrop(event) {
       else if (child.alt === 'w__king') {
         alert('Black has won!');
       }
+      
       reset();
       createBoard(initialBoardState);
       initializePieces();
+      localStorage.clear();
       return;
     }
   }
@@ -146,7 +148,7 @@ function dragDrop(event) {
     //check if its a pawn that can be promoted
     console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
     if (isPromotion(piece, startPos, endPos)) {
-      Promote();
+      Promote(startPos);
     }
   }
 
@@ -281,14 +283,12 @@ function isLegalMove(piece, startPos, endPos) {
 //check if pawn will promote
 function isPromotion(piece, startPos, endPos) {
   if (piece === 'w__pawn') {
-    //const otherSidePos = ['0', '1', '2', '3', '4', '5', '6', '7'];
     if (endPos >= 0 && endPos <= 7) {
       return true;
     }
     else return false;
   }
   else if (piece === 'b__pawn') {
-    //const otherSidePos = ['56', '57', '58', '59', '60', '61', '62', '63'];
     if (endPos >= 56 && endPos <= 63) {
       return true;
     }
@@ -296,7 +296,7 @@ function isPromotion(piece, startPos, endPos) {
   }
 }
 
-function Promote() {
+function Promote(startPos) {
   console.log('promotion piece', selectedPiece);
   console.log(selectedPiece.src);
   choices = ['Queen', 'Rook', 'Knight', 'Bishop'];
@@ -304,7 +304,6 @@ function Promote() {
   let validChoice = true;
   while (validChoice) {
     userChoice = prompt(`Promotion choices: ${choices.join(', ')}`, 'Queen');
-    //userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
     if (choices.includes(userChoice.charAt(0).toUpperCase() + userChoice.slice(1))) {
       validChoice = false;
     }
@@ -319,6 +318,8 @@ function Promote() {
   selectedPiece.alt = `${selectedPiece.alt[0]}__${lowerCase}`;
 
   console.log('alt after promote:', selectedPiece.alt);
+
+  board[startPos] = `${selectedPiece.alt[0]}` + '__' + `${lowerCase}`;
 }
 
 function isCastling(piece, startPos, endPos) {
@@ -451,15 +452,21 @@ function saveGame() {
 
 function loadGame() {
   let loadedGame = localStorage.getItem('savedGame');
-  let loadedPlayerTurn = localStorage.getItem('savedPlayerTurn');
 
   console.log('loadedGame: ', loadedGame);
-  console.log('loadedPlayerTurn: ', loadedPlayerTurn);
 
   const loadedGameArray = loadedGame.split(',');
   console.log('arary: ', loadedGameArray);
 
-  return loadedGameArray, loadedPlayerTurn;
+  return loadedGameArray;
+}
+
+function loadPlayerTurn() {
+  const loadedPlayerTurn = localStorage.getItem('savedPlayerTurn');
+
+  console.log('loadedPlayerTurn: ', loadedPlayerTurn);
+
+  return loadedPlayerTurn;
 }
 
 function checkForSavedGame() {
@@ -476,21 +483,25 @@ function checkForSavedGame() {
 
 // DRIVER START
 
- if (!checkForSavedGame) {
-   let loadedGame;
-   let loadedPlayerTurn
-   loadedGame, loadedPlayerTurn = loadGame();
+ if (checkForSavedGame) {
+   const loadedGame = loadGame();
+   const loadedPlayerTurn = loadPlayerTurn();
 
    playerTurn = loadedPlayerTurn;
 
-  createBoard(loadedGame);
-  initializePieces();
+   if (playerTurn === 'w') {
+    gameStatus.textContent = "White's turn.";
+   }
+   else gameStatus.textContent = "Black's turn.";
+
+   createBoard(loadedGame);
+   initializePieces();
 } 
  else {
-  createBoard(initialBoardState);
+   createBoard(initialBoardState);
    initializePieces();
    playerTurn = 'w';
-  gameStatus.textContent = "White's turn."
+   gameStatus.textContent = "White's turn.";
 }
 
 // Temporary will change to load with game save
