@@ -300,7 +300,7 @@ function Promote() {
   console.log(selectedPiece.src);
   choices = ['Queen', 'Rook', 'Knight', 'Bishop'];
   let userChoice = '';
-  let validChoice = true;
+  let validChoice = false;
   while (!validChoice) {
     userChoice = prompt(`Promotion choices: ${choices.join(', ')}`, 'Queen');
     //userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
@@ -312,9 +312,9 @@ function Promote() {
   console.log('alt:', selectedPiece.alt[0]);
 
   const lowerCase = userChoice.charAt(0).toLowerCase() + userChoice.slice(1);
+  console.log('lowCase: ', lowerCase)
   selectedPiece.src = `/assets/${selectedPiece.alt[0]}__${lowerCase}.svg`;
   selectedPiece.alt = `${selectedPiece.alt[0]}__${lowerCase}`;
-  console.log('lowCase: ', lowerCase)
 
   console.log('alt after promote:', selectedPiece.alt);
 }
