@@ -136,7 +136,7 @@ function dragDrop(event) {
         alert('Black has won!');
       }
       reset();
-      createBoard();
+      createBoard(initialBoardState);
       initializePieces();
     }
   }
