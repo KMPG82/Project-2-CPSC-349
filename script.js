@@ -6,10 +6,10 @@ const gameStatus = document.getElementById('game__status');
 const initialBoardState = [
   "b__rook", "b__knight", "b__bishop", "b__queen", "b__king", "b__bishop", "b__knight", "b__rook",
   "b__pawn", "b__pawn", "b__pawn", "b__pawn", "b__pawn", "b__pawn", "b__pawn", "b__pawn",
-  null, null, null, null, null, null, null, null,
-  null, null, null, null, null, null, null, null,
-  null, null, null, null, null, null, null, null,
-  null, null, null, null, null, null, null, null,
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
+  '', '', '', '', '', '', '', '',
   "w__pawn", "w__pawn", "w__pawn", "w__pawn", "w__pawn", "w__pawn", "w__pawn", "w__pawn",
   "w__rook", "w__knight", "w__bishop", "w__queen", "w__king", "w__bishop", "w__knight", "w__rook"
 ];
@@ -20,8 +20,8 @@ let playerTurn;
 
 // Creates <div class= chess__square>  elements
 
-function createBoard() {
-  board = [...initialBoardState];
+function createBoard(loadBoard) {
+  board = [...loadBoard];
   console.log('board: ', board);
   for (let rank = 0; rank < 8; rank++) {
     for (let file = 0; file < 8; file++) {
@@ -53,7 +53,7 @@ function initializePieces() {
       let pieceName = board[index];
 
       console.log('pieceName in intiliaze: ', pieceName);
-      if (pieceName !== null) {
+      if (pieceName !== '') {
         let color = pieceName[0];
         let pieceImg = document.createElement('img');
         pieceImg.src = `assets/${pieceName}.svg`;
@@ -114,7 +114,7 @@ function dragDrop(event) {
   const piece = selectedPiece.alt;
   const startPos = selectedPiece.parentNode.getAttribute('square-id');
 
-  let child = null;
+  let child = '';
   if (capture) {
     child = square;
     square = square.parentNode;
@@ -125,7 +125,7 @@ function dragDrop(event) {
   if (!isLegalMove(piece, startPos, endPos)) { return; }
 
   console.log("the child: ", child);
-  if (child !== null) {
+  if (child !== '') {
     child.remove();
     //check if the piece being taken is a king piece
     if (child.alt === 'b__king' || child.alt === 'w__king') {
@@ -151,7 +151,7 @@ function dragDrop(event) {
 
   square.appendChild(selectedPiece);
   board[endPos] = board[startPos];
-  board[startPos] = null;
+  board[startPos] = '';
 
   if (piece === 'w__king' || piece === 'b__king') {
     //check if castling
@@ -194,28 +194,28 @@ function isLegalMove(piece, startPos, endPos) {
       //move two spaces if in starting position
       if (w_startRank.includes(startPos) && startPos + -8 * 2 === endPos) {
         console.log('1');
-        legal = isPathClear(startPos, endPos) && board[endPos] === null;
+        legal = isPathClear(startPos, endPos) && board[endPos] === '';
       }//move one space
       else if (startPos - 8 === endPos) {
         console.log('2');
-        legal = isPathClear(startPos, endPos) && board[endPos] === null;
+        legal = isPathClear(startPos, endPos) && board[endPos] === '';
       }//diagonal capture
-      else if ((startPos - 7 === endPos || startPos - 9 === endPos) && board[endPos] !== null) {
+      else if ((startPos - 7 === endPos || startPos - 9 === endPos) && board[endPos] !== '') {
         console.log('3');
 
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
 
     case 'b__pawn':
       const b_startRank = [8, 9, 10, 11, 12, 13, 14, 15];
       if (b_startRank.includes(startPos) && startPos + 8 * 2 === endPos) {
-        legal = isPathClear(startPos, endPos) && board[endPos] === null;
+        legal = isPathClear(startPos, endPos) && board[endPos] === '';
 
       } else if (startPos + 8 === endPos) {
-        legal = isPathClear(startPos, endPos) && board[endPos] === null;
-      } else if ((startPos + 7 === endPos || startPos + 9 === endPos) && board[endPos] !== null) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && board[endPos] === '';
+      } else if ((startPos + 7 === endPos || startPos + 9 === endPos) && board[endPos] !== '') {
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
 
@@ -229,10 +229,10 @@ function isLegalMove(piece, startPos, endPos) {
         if (startRank > 5 || startRank < 2 || startFile > 5 || startFile < 2) {
           let endFile = endPos % 8;
           if (Math.abs(endFile - startFile) < 3) {
-            legal = board[endPos] === null ? true : (board[endPos] === null ? true : board[endPos][0] !== playerTurn)
+            legal = board[endPos] === '' ? true : (board[endPos] === '' ? true : board[endPos][0] !== playerTurn)
           }
         } else {
-          legal = (board[endPos] === null ? true : board[endPos][0] !== playerTurn)
+          legal = (board[endPos] === '' ? true : board[endPos][0] !== playerTurn)
         }
       }
       break;
@@ -240,14 +240,14 @@ function isLegalMove(piece, startPos, endPos) {
     case 'w__bishop':
     case 'b__bishop':
       if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
 
     case 'w__rook':
     case 'b__rook':
       if (Math.abs(startPos - endPos) % 8 === 0 || Math.floor(startPos / 8) === Math.floor(endPos / 8)) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
     case 'w__queen':
@@ -255,7 +255,7 @@ function isLegalMove(piece, startPos, endPos) {
       if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0 ||
         Math.abs(startPos - endPos) % 8 === 0 || Math.abs(startPos - endPos) < startPos + 8
       ) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
 
@@ -263,13 +263,13 @@ function isLegalMove(piece, startPos, endPos) {
     case 'b__king':
       const kingOffset = [1, 7, 8, 9];
       if (kingOffset.includes(Math.abs(startPos - endPos))) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       } //castling
       else if (piece === 'w__king' && startPos == 60 && ((endPos == 62 && 'w__rook' === board[63]) || (endPos == 58 && 'w__rook' === board[56]))) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       } //castling
       else if (piece === 'b__king' && startPos == 4 && ((endPos == 2 && 'b__rook' === board[0]) || (endPos == 6 && 'b__rook' === board[7]))) {
-        legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
+        legal = isPathClear(startPos, endPos) && (board[endPos] === '' ? true : board[endPos][0] !== playerTurn);
       }
       break;
   }
@@ -413,7 +413,7 @@ function isPathClear(startPos, endPos) {
     rank += deltaRank, file += deltaFile) {
     console.log(rank, file);
     let index = Math.abs(rank) * 8 + Math.abs(file);
-    if (board[index] !== null) {
+    if (board[index] !== '') {
       console.log("invalid move:", index);
       return false;
     }
@@ -432,7 +432,7 @@ resetButton.addEventListener('click', () => {
 });
 
 function reset() {
-  selectedPiece = null;
+  selectedPiece = '';
   playerTurn = 'w';
   gameStatus.textContent = "White's turn."
 
@@ -457,7 +457,7 @@ function loadGame() {
 
 // DRIVER START
 
-createBoard();
+createBoard(initialBoardState);
 
 // Temporary will change to load with game save
 playerTurn = 'w';
