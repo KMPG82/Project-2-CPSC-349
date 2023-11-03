@@ -56,7 +56,9 @@ function initializePieces() {
       if (pieceName !== null) {
         let color = pieceName[0];
         let pieceImg = document.createElement('img');
-        pieceImg.src = `assets/${pieceName}.svg`;
+        //pieceImg.src = `assets/${pieceName}.svg`;
+        pieceImg.src = `assets/w__king.png`;
+
         pieceImg.classList.add('chess__piece');
         pieceImg.classList.add(color);
         pieceImg.alt = pieceName;
