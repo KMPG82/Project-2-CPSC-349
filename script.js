@@ -31,7 +31,7 @@ function createBoard() {
 
       // Alternating square color
       if ((rank + file) % 2 === 0) {
-          square.classList.add('dark');
+        square.classList.add('dark');
       }
 
       // Adding events to each square
@@ -109,7 +109,7 @@ function dragDrop(event) {
   // Finding the opponent color of current player
   const opponent = playerTurn === 'w' ? 'b' : 'w';
   // Checks if the square dropped onto contains a piece
-  const capture = square.classList.contains('chess__piece') 
+  const capture = square.classList.contains('chess__piece')
   // Checks if the square dropped onto contains a piece from the opponent
   const piece = selectedPiece.alt;
   const startPos = selectedPiece.parentNode.getAttribute('square-id');
@@ -121,7 +121,7 @@ function dragDrop(event) {
   }
 
   const endPos = square.getAttribute('square-id');
-  console.log('is legal move: ',!isLegalMove(piece, startPos, endPos));
+  console.log('is legal move: ', !isLegalMove(piece, startPos, endPos));
   if (!isLegalMove(piece, startPos, endPos)) { return; }
 
   console.log("the child: ", child);
@@ -148,7 +148,7 @@ function dragDrop(event) {
       Promote();
     }
   }
-   
+
   square.appendChild(selectedPiece);
   board[endPos] = board[startPos];
   board[startPos] = null;
@@ -206,9 +206,9 @@ function isLegalMove(piece, startPos, endPos) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
-    
+
     case 'b__pawn':
-      const b_startRank = [8,9,10,11,12,13,14,15];
+      const b_startRank = [8, 9, 10, 11, 12, 13, 14, 15];
       if (b_startRank.includes(startPos) && startPos + 8 * 2 === endPos) {
         legal = isPathClear(startPos, endPos) && board[endPos] === null;
 
@@ -218,7 +218,7 @@ function isLegalMove(piece, startPos, endPos) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
-    
+
     case 'w__knight':
     case 'b__knight':
       const knightOffset = [15, 17, 10, 6];
@@ -234,16 +234,16 @@ function isLegalMove(piece, startPos, endPos) {
         } else {
           legal = (board[endPos] === null ? true : board[endPos][0] !== playerTurn)
         }
-       }
+      }
       break;
-    
+
     case 'w__bishop':
     case 'b__bishop':
       if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
-    
+
     case 'w__rook':
     case 'b__rook':
       if (Math.abs(startPos - endPos) % 8 === 0 || Math.floor(startPos / 8) === Math.floor(endPos / 8)) {
@@ -253,22 +253,22 @@ function isLegalMove(piece, startPos, endPos) {
     case 'w__queen':
     case 'b__queen':
       if (Math.abs(startPos - endPos) % 9 === 0 || Math.abs(startPos - endPos) % 7 === 0 ||
-          Math.abs(startPos - endPos) % 8 === 0 || Math.abs(startPos - endPos) < startPos + 8
+        Math.abs(startPos - endPos) % 8 === 0 || Math.abs(startPos - endPos) < startPos + 8
       ) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
-    
+
     case 'w__king':
     case 'b__king':
       const kingOffset = [1, 7, 8, 9];
       if (kingOffset.includes(Math.abs(startPos - endPos))) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       } //castling
-      else if (piece === 'w__king' && startPos == 60 && ((endPos == 62  && 'w__rook' === board[63]) || (endPos == 58  && 'w__rook' === board[56]))) {
+      else if (piece === 'w__king' && startPos == 60 && ((endPos == 62 && 'w__rook' === board[63]) || (endPos == 58 && 'w__rook' === board[56]))) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       } //castling
-      else if (piece === 'b__king'  && startPos == 4 && ((endPos == 2  && 'b__rook' === board[0]) || (endPos == 6  && 'b__rook' === board[7]))) {
+      else if (piece === 'b__king' && startPos == 4 && ((endPos == 2 && 'b__rook' === board[0]) || (endPos == 6 && 'b__rook' === board[7]))) {
         legal = isPathClear(startPos, endPos) && (board[endPos] === null ? true : board[endPos][0] !== playerTurn);
       }
       break;
@@ -301,13 +301,12 @@ function Promote() {
   choices = ['Queen', 'Rook', 'Knight', 'Bishop'];
   let userChoice = '';
   let validChoice = true;
-  while (validChoice) {
+  while (!validChoice) {
     userChoice = prompt(`Promotion choices: ${choices.join(', ')}`, 'Queen');
-    userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
-    if (choices.includes(userChoice))
-    {
-      validChoice = false;
-      }
+    //userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
+    if (choices.includes(userChoice.charAt(0).toUpperCase() + userChoice.slice(1))) {
+      validChoice = true;
+    }
   }
   console.log('alt:', selectedPiece.alt);
   console.log('alt:', selectedPiece.alt[0]);
@@ -343,7 +342,7 @@ function castle(piece, startPos, endPos) {
       board[61] = temp; //swap rook
 
       emptySquare.appendChild(rook);
-     
+
       console.log('im rooksquare', rookSquare);
       console.log('im rook', rook);
       console.log('im emptysquare', emptySquare);
@@ -358,7 +357,7 @@ function castle(piece, startPos, endPos) {
       board[59] = temp; //swap rook
 
       emptySquare.appendChild(rook);
-     
+
       console.log('im rooksquare', rookSquare);
       console.log('im rook', rook);
       console.log('im emptysquare', emptySquare);
@@ -375,7 +374,7 @@ function castle(piece, startPos, endPos) {
       board[5] = temp; //swap rook
 
       emptySquare.appendChild(rook);
-     
+
       console.log('im rooksquare', rookSquare);
       console.log('im rook', rook);
       console.log('im emptysquare', emptySquare);
@@ -390,7 +389,7 @@ function castle(piece, startPos, endPos) {
       board[3] = temp; //swap rook
 
       emptySquare.appendChild(rook);
-     
+
       console.log('im rooksquare', rookSquare);
       console.log('im rook', rook);
       console.log('im emptysquare', emptySquare);
@@ -405,24 +404,24 @@ function isPathClear(startPos, endPos) {
   let endRank = Math.floor(endPos / 8);
   let endFile = endPos % 8;
 
-  let deltaRank = Math.sign(endRank- startRank);
+  let deltaRank = Math.sign(endRank - startRank);
   let deltaFile = Math.sign(endFile - startFile);
 
-  for (let rank = startRank + deltaRank, file = startFile + deltaFile; 
-       rank !== endRank || file !== endFile; 
-       rank += deltaRank, file += deltaFile) {
-      console.log(rank, file);
-      let index = Math.abs(rank) * 8 + Math.abs(file);
-      if (board[index] !== null) {
-          console.log("invalid move:", index);
-          return false;
-      }
+  for (let rank = startRank + deltaRank, file = startFile + deltaFile;
+    rank !== endRank || file !== endFile;
+    rank += deltaRank, file += deltaFile) {
+    console.log(rank, file);
+    let index = Math.abs(rank) * 8 + Math.abs(file);
+    if (board[index] !== null) {
+      console.log("invalid move:", index);
+      return false;
+    }
   }
   return true;
 }
 
 function isKingSafe() {
- // NEED TO IMPLEMENT
+  // NEED TO IMPLEMENT
 }
 
 resetButton.addEventListener('click', () => {
