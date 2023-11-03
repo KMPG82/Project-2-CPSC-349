@@ -312,8 +312,8 @@ function Promote() {
   console.log('alt:', selectedPiece.alt);
   console.log('alt:', selectedPiece.alt[0]);
 
-  selectedPiece.src = `/assets/${selectedPiece.alt[0]}__${userChoice}.svg`;
   const lowerCase = userChoice.charAt(0).toLowerCase() + userChoice.slice(1);
+  selectedPiece.src = `/assets/${selectedPiece.alt[0]}__${lowerCase}.svg`;
   selectedPiece.alt = `${selectedPiece.alt[0]}__${lowerCase}`;
   console.log('lowCase: ', lowerCase)
 
