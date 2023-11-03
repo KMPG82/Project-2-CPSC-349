@@ -138,6 +138,7 @@ function dragDrop(event) {
       reset();
       createBoard(initialBoardState);
       initializePieces();
+      return;
     }
   }
 
@@ -445,23 +446,53 @@ function saveGame() {
   console.log('initial board before saving: ', initialBoardState);
   console.log('board before saving: ', board);
   localStorage.setItem('savedGame', board);
+  localStorage.setItem('savedPlayerTurn', playerTurn);
 }
 
 function loadGame() {
   let loadedGame = localStorage.getItem('savedGame');
+  let loadedPlayerTurn = localStorage.getItem('savedPlayerTurn');
+
   console.log('loadedGame: ', loadedGame);
+  console.log('loadedPlayerTurn: ', loadedPlayerTurn);
 
   const loadedGameArray = loadedGame.split(',');
   console.log('arary: ', loadedGameArray);
+
+  return loadedGameArray, loadedPlayerTurn;
+}
+
+function checkForSavedGame() {
+  //get saved game if present
+  const gameSave =  localStorage.getItem('savedGame');
+
+  //check for saved game in local storage
+  if (gameSave === null) {
+    return false; //no game save
+  }
+  else return true; //game save
+
 }
 
 // DRIVER START
 
-createBoard(initialBoardState);
+ if (!checkForSavedGame) {
+   let loadedGame;
+   let loadedPlayerTurn
+   loadedGame, loadedPlayerTurn = loadGame();
+
+   playerTurn = loadedPlayerTurn;
+
+  createBoard(loadedGame);
+  initializePieces();
+} 
+ else {
+  createBoard(initialBoardState);
+   initializePieces();
+   playerTurn = 'w';
+  gameStatus.textContent = "White's turn."
+}
 
 // Temporary will change to load with game save
-playerTurn = 'w';
-gameStatus.textContent = "White's turn."
-initializePieces();
 
-loadGame();
+
