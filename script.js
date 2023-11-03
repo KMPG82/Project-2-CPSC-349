@@ -300,12 +300,12 @@ function Promote() {
   console.log(selectedPiece.src);
   choices = ['Queen', 'Rook', 'Knight', 'Bishop'];
   let userChoice = '';
-  let validChoice = false;
-  while (!validChoice) {
+  let validChoice = true;
+  while (validChoice) {
     userChoice = prompt(`Promotion choices: ${choices.join(', ')}`, 'Queen');
     //userChoice = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
     if (choices.includes(userChoice.charAt(0).toUpperCase() + userChoice.slice(1))) {
-      validChoice = true;
+      validChoice = false;
     }
   }
   console.log('alt:', selectedPiece.alt);
