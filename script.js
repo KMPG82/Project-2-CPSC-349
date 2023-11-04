@@ -101,26 +101,37 @@ function dragEnd(event) {
     //take off legal move highlights
     square.classList.remove('move__legal')
   });
-
+  // Check if the king is in check after the move
+  if (!isKingSafe(playerTurn)) {
+    if (isCheckmate(playerTurn)) {
+      gameStatus.textContent = (playerTurn === 'w' ? "White" : "Black") + " is in checkmate!";
+      // End the game or reset the board
+    } else {
+      gameStatus.textContent = (playerTurn === 'w' ? "White" : "Black") + " is in check!";
+      // Highlight the king or indicate check in some other way
+    }
+  }
 }
 
-//when piece is dropped onto a square
 function dragDrop(event) {
   event.stopPropagation();
   console.log(event.target);
   let square = event.target;
 
-  //check if moved piece color matches current player turn color
+  // Check if moved piece color matches current player turn color
   if (!selectedPiece.classList.contains(playerTurn)) { return; }
-  //find the opponent color of current player
-  const opponent = playerTurn === 'w' ? 'b' : 'w';
-  //checks if the square dropped onto contains a piece
-  const capture = square.classList.contains('chess__piece')
-  //checks if the square dropped onto contains a piece from the opponent
+
+  // Find the opponent color of current player
+  const opponentColor = playerTurn === 'w' ? 'b' : 'w';
+
+  // Checks if the square dropped onto contains a piece
+  const capture = square.classList.contains('chess__piece');
+  
+  // Checks if the square dropped onto contains a piece from the opponent
   const piece = selectedPiece.alt;
   const startPos = selectedPiece.parentNode.getAttribute('square-id');
 
-  //if a capture is taking place
+  // If a capture is taking place
   let child = '';
   if (capture) {
     child = square;
@@ -129,55 +140,60 @@ function dragDrop(event) {
 
   const endPos = square.getAttribute('square-id');
 
-  //check if this is a legal move
-  console.log('is legal move: ', !isLegalMove(piece, startPos, endPos));
+  // Check if this is a legal move
+  console.log('is legal move: ', isLegalMove(piece, startPos, endPos));
   if (!isLegalMove(piece, startPos, endPos)) { return; }
 
-  console.log("the child: ", child);
+  // If a piece is being captured, remove it from the board
   if (child !== '') {
-    child.remove();
-    //check if the piece being taken is a king
-    if (child.alt === 'b__king' || child.alt === 'w__king') {
-      //game over :(
-      if (child.alt === 'b__king') {
-        alert('White has won!');
-      }
-      else if (child.alt === 'w__king') {
-        alert('Black has won!');
-      }
-      
-      //reset the game after game over
-      reset();
-      createBoard(initialBoardState);
-      initializePieces();
+    // Do not remove the king, but handle check or checkmate logic
+    if (child.alt.includes('__king')) {
+      // Handle check or checkmate logic here
+      // For now, we'll just prevent the king from being captured
       return;
+    } else {
+      // Remove the captured piece
+      child.remove();
     }
   }
 
-  //check for promotion
-  if (piece === 'w__pawn' || piece === 'b__pawn') {
+  // Move the piece to its new home
+  square.appendChild(selectedPiece);
+  board[endPos] = board[startPos];
+  board[startPos] = '';
+
+  // Check for promotion
+  if (piece.includes('__pawn')) {
     console.log('isPromotion(): ', isPromotion(piece, startPos, endPos));
     if (isPromotion(piece, startPos, endPos)) {
       Promote(startPos);
     }
   }
 
-  //move the piece to its new home
-  square.appendChild(selectedPiece);
-  board[endPos] = board[startPos];
-  board[startPos] = '';
-
-  //check if castling
-  if (piece === 'w__king' || piece === 'b__king') {
+  // Check if castling
+  if (piece.includes('__king')) {
     console.log('isCastling: ', isCastling(piece, startPos, endPos));
     if (isCastling(piece, startPos, endPos)) {
-      castle(piece, startPos, endPos); //move rook
+      castle(piece, startPos, endPos); // Move rook
     }
   }
 
-  //change player turn
+  // After the move, check for check or checkmate
+  if (isKingInCheck(opponentColor)) {
+    if (isCheckmate(opponentColor)) {
+      // End the game with checkmate
+      alert((playerTurn === 'w' ? "White" : "Black") + " wins by checkmate!");
+      reset();
+    } else {
+      // Notify the players of a check
+      alert((opponentColor === 'w' ? "White" : "Black") + " is in check!");
+    }
+  }
+
+  // Change player turn
   changePlayer();
-  //save the current game state after move to keep game save up to date
+
+  // Save the current game state after move to keep game save up to date
   saveGame();
 }
 
@@ -456,9 +472,90 @@ function isPathClear(startPos, endPos) {
   return true;
 }
 
-//might not get to in time
-function isKingSafe() {
-  // NEED TO IMPLEMENT
+// Check if the king of the current player is in check
+function isKingSafe(player) {
+  // Find the king's position
+  let kingPos = findKing(player);
+  if (kingPos === -1) return true; // If the king is not found, assume safe (shouldn't happen in a valid game)
+
+  // Check for checks from pawns
+  if (pawnCheck(kingPos, player)) return false;
+
+  // Check for checks from knights
+  if (knightCheck(kingPos, player)) return false;
+
+  // Check for checks from bishops, rooks, and queens
+  if (slidingCheck(kingPos, player)) return false;
+
+  // Check for checks from the opposing king (shouldn't happen normally, but included for completeness)
+  if (kingCheck(kingPos, player)) return false;
+
+  // If none of the checks return true, the king is safe
+  return true;
+}
+
+function findKing(player) {
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === player + '__king') {
+      return i;
+    }
+  }
+  return -1; // King not found (this should not happen if the board is a valid chess position)
+}
+
+function pawnCheck(kingPos, player) {
+  // Calculate pawn attack positions based on player color
+  let attackPositions = player === 'w' ? [kingPos - 7, kingPos - 9] : [kingPos + 7, kingPos + 9];
+  for (let pos of attackPositions) {
+    if (pos >= 0 && pos < 64 && board[pos] === (player === 'w' ? 'b' : 'w') + '__pawn') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function knightCheck(kingPos, player) {
+  // Calculate knight move positions
+  let knightMoves = [kingPos - 17, kingPos - 15, kingPos - 10, kingPos - 6, kingPos + 6, kingPos + 10, kingPos + 15, kingPos + 17];
+  for (let pos of knightMoves) {
+    if (pos >= 0 && pos < 64 && board[pos] === (player === 'w' ? 'b' : 'w') + '__knight') {
+      return true;
+    }
+  }
+  return false;
+}
+
+function slidingCheck(kingPos, player) {
+  // Directions that bishops, rooks, and queens can move
+  let directions = [-9, -8, -7, -1, 1, 7, 8, 9];
+  let opponent = player === 'w' ? 'b' : 'w';
+  for (let dir of directions) {
+    for (let pos = kingPos + dir; pos >= 0 && pos < 64; pos += dir) {
+      // If we hit our own piece, break out of the loop
+      if (board[pos][0] === player) break;
+      // If we hit an opponent's piece, check if it's a bishop, rook, or queen
+      if (board[pos][0] === opponent) {
+        if ((Math.abs(dir) === 1 || Math.abs(dir) === 8) && board[pos][2] === 'rook') return true;
+        if ((Math.abs(dir) === 7 || Math.abs(dir) === 9) && board[pos][2] === 'bishop') return true;
+        if (board[pos][2] === 'queen') return true;
+        break;
+      }
+      // If we've moved to a different rank, break out of the loop (for horizontal/vertical moves)
+      if (Math.floor(pos / 8) !== Math.floor((pos - dir) / 8)) break;
+    }
+  }
+  return false;
+}
+
+function kingCheck(kingPos, player) {
+  // Calculate king move positions
+  let kingMoves = [kingPos - 9, kingPos - 8, kingPos - 7, kingPos - 1, kingPos + 1, kingPos + 7, kingPos + 8, kingPos + 9];
+  for (let pos of kingMoves) {
+    if (pos >= 0 && pos < 64 && board[pos] === (player === 'w' ? 'b' : 'w') + '__king') {
+      return true;
+    }
+  }
+  return false;
 }
 
 //reset game button
