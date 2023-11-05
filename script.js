@@ -28,7 +28,7 @@ function createBoard(loadBoard) {
   for (let rank = 0; rank < 8; rank++) {
     for (let file = 0; file < 8; file++) {
       let square = document.createElement('div');
-      square.setAttribute('square-id', rank * 8 + file);
+      square.setAttribute('id', rank * 8 + file);
       square.classList.add('chess__square');
 
       //alternate square color
@@ -83,12 +83,12 @@ function initializePieces() {
 function dragStart(event) {
   selectedPiece = event.target;
   if (!selectedPiece.classList.contains(playerTurn)) { return; }
-  let startPos = selectedPiece.parentNode.getAttribute('square-id');
+  let startPos = selectedPiece.parentNode.getAttribute('id');
 
   for (let i = 0; i < 64; i++) {
     //check if legal move, if legal, highlight the legal squares
     if (isLegalMove(selectedPiece.alt, startPos, i)) {
-      let square = document.querySelector('[square-id="' + i + '"]');
+      let square = document.querySelector('[id="' + i + '"]');
       square.classList.add("move__legal");
     }
   }
@@ -118,7 +118,7 @@ function dragDrop(event) {
   const capture = square.classList.contains('chess__piece')
   //checks if the square dropped onto contains a piece from the opponent
   const piece = selectedPiece.alt;
-  const startPos = selectedPiece.parentNode.getAttribute('square-id');
+  const startPos = selectedPiece.parentNode.getAttribute('id');
 
   //if a capture is taking place
   let child = '';
@@ -127,7 +127,7 @@ function dragDrop(event) {
     square = square.parentNode;
   }
 
-  const endPos = square.getAttribute('square-id');
+  const endPos = square.getAttribute('id');
 
   //check if this is a legal move
   console.log('is legal move: ', !isLegalMove(piece, startPos, endPos));
@@ -169,10 +169,13 @@ function dragDrop(event) {
 
   //check if castling
   if (piece === 'w__king' || piece === 'b__king') {
+    console.log('selectedPiece: ', selectedPiece); 
     console.log('isCastling: ', isCastling(piece, startPos, endPos));
     if (isCastling(piece, startPos, endPos)) {
       castle(piece, startPos, endPos); //move rook
     }
+    selectedPiece.classList.add('moved');
+    console.log('selectedPiece: ', selectedPiece); 
   }
 
   //change player turn
@@ -349,11 +352,12 @@ function Promote(startPos) {
 
 //check if king is castling
 function isCastling(piece, startPos, endPos) {
-  if (piece === 'w__king' && startPos == 60 && ((endPos == 62 && 'w__rook' === board[63]) || (endPos == 58 && 'w__rook' === board[56]))) {
+  console.log('piece: ', piece);
+  if (piece === 'w__king' && startPos == 60 && ((endPos == 62 && 'w__rook' === board[63]) || (endPos == 58 && 'w__rook' === board[56] && board[57] === '')) && !selectedPiece.classList.contains('moved')) {
     return true;
   }
   else
-    if (piece === 'b__king' && startPos == 4 && ((endPos == 6 && 'b__rook' === board[7]) || (endPos == 2 && 'b__rook' === board[0]))) {
+    if (piece === 'b__king' && startPos == 4 && ((endPos == 6 && 'b__rook' === board[7]) || (endPos == 2 && 'b__rook' === board[0] && board[1] === '')) && !selectedPiece.classList.contains('moved')) {
       return true;
     }
     else return false;
@@ -365,9 +369,9 @@ function castle(piece, startPos, endPos) {
   if (piece === 'w__king') {
     //castle w/ rook closest to king
     if (startPos == 60 && endPos == 62 && 'w__rook' === board[63]) {
-      let rookSquare = document.querySelector('[square-id="63"]');
+      let rookSquare = document.querySelector('[id="63"]');
       let rook = rookSquare.querySelector('img');
-      let emptySquare = document.querySelector('[square-id="61"]');
+      let emptySquare = document.querySelector('[id="61"]');
 
       let temp = board[63]; //rook
       board[63] = board[61]; //swap empty space
@@ -381,9 +385,9 @@ function castle(piece, startPos, endPos) {
     }
     else {
       //castle w/ rook farthest from king
-      let rookSquare = document.querySelector('[square-id="56"]');
+      let rookSquare = document.querySelector('[id="56"]');
       let rook = rookSquare.querySelector('img');
-      let emptySquare = document.querySelector('[square-id="59"]');
+      let emptySquare = document.querySelector('[id="59"]');
 
       let temp = board[56]; //rook
       board[56] = board[59]; //swap empty space
@@ -399,9 +403,9 @@ function castle(piece, startPos, endPos) {
   if (piece === 'b__king') {
     //castle w/ rook closest to king
     if (startPos == 4 && endPos == 6 && 'b__rook' === board[7]) {
-      let rookSquare = document.querySelector('[square-id="7"]');
+      let rookSquare = document.querySelector('[id="7"]');
       let rook = rookSquare.querySelector('img');
-      let emptySquare = document.querySelector('[square-id="5"]');
+      let emptySquare = document.querySelector('[id="5"]');
 
       let temp = board[7]; //rook
       board[7] = board[5]; //swap empty space
@@ -415,9 +419,9 @@ function castle(piece, startPos, endPos) {
     }
     else {
       //castle w/ rook farthest from king
-      let rookSquare = document.querySelector('[square-id="0"]');
+      let rookSquare = document.querySelector('[id="0"]');
       let rook = rookSquare.querySelector('img');
-      let emptySquare = document.querySelector('[square-id="3"]');
+      let emptySquare = document.querySelector('[id="3"]');
 
       let temp = board[0]; //rook
       board[0] = board[3]; //swap empty space
