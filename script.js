@@ -462,7 +462,42 @@ function isPathClear(startPos, endPos) {
 
 //might not get to in time
 function isKingSafe() {
-  // NEED TO IMPLEMENT
+  // // Find the king's position
+  // const kingPosition = board.findIndex(piece => piece === `${playerTurn}__king`);
+  // if (kingPosition === -1) {
+  //   console.error('King not found on the board');
+  //   return false;
+  // }
+
+  // // Directions that the king can be attacked from
+  // const attackVectors = [
+  //   -8, 
+  //   -7, 
+  //   1,  
+  //   9,  
+  //   8,  
+  //   7,  
+  //   -1, 
+  //   -9  
+  // ];
+
+  // // Check immediate squares around the king for threats
+  // for (const vector of attackVectors) {
+  //   const checkPosition = kingPosition + vector;
+  //   if (checkPosition >= 0 && checkPosition < 64) {
+  //     const pieceAtCheckPosition = board[checkPosition];
+  //     if (pieceAtCheckPosition && pieceAtCheckPosition[0] !== playerTurn) {
+  //       // Found an opponent's piece, now check if it can attack the king
+  //       if (isLegalAttack(pieceAtCheckPosition, checkPosition, kingPosition)) {
+  //         alert('Check!');
+  //         return false; // King is not safe
+  //       }
+  //     }
+  //   }
+  // }
+
+  // // If no immediate threats are found, the king is safe for now
+  // return true;
 }
 
 //reset game button
